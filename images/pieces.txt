@@ -1,0 +1,6 @@
+P - Pawn
+N - Knight
+B - Bishop
+R - Rook
+K - King
+Q - Queen
