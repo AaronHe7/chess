@@ -1,8 +1,21 @@
 body {
+  font-family: roboto, sans-serif;
   overflow: hidden;
 }
 
+.game {
+  margin: auto;
+  height: 80vh;
+  width: 80vh;
+  display: grid;
+  --board-length: 80vh + 5px;
+}
+
 .board {
+  z-index: 1;
+  grid-column: 1;
+  grid-row: 1;
+
   display: flex;
   flex-direction: column;
 }
@@ -12,6 +25,7 @@ body {
 }
 
 .board > div > div {
+  position: relative;
   width: 10vh;
   height: 10vh;
   border: 1px solid black; 
@@ -33,6 +47,18 @@ body {
   opacity: 0.5;
 }
 
+.letter-marker {
+  font-size: 1.7vh;
+  position: absolute;
+  bottom: 0.25vh;
+  right: 0.25vh;
+}
+
+.number-marker {
+  font-size: 1.7vh;
+  margin: 0.5vh;
+}
+
 .move {
   cursor: pointer;
   -webkit-filter: grayscale(100%) brightness(30%) sepia(100%) hue-rotate(-180deg) saturate(0%) contrast(0.8);
@@ -48,4 +74,15 @@ body {
 .check {
   -webkit-filter: invert(40%) grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(400%) contrast(2);
   filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8);
+}
+
+.castle {
+  cursor: pointer;
+  -webkit-filter: grayscale(100%) brightness(30%) sepia(100%) hue-rotate(-180deg) saturate(0%) contrast(0.8);
+  filter: grayscale(100%) brightness(30%) sepia(100%) hue-rotate(-180deg) saturate(700%) contrast(0.8);
+}
+
+.target {
+  -webkit-filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(50deg) saturate(1000%) contrast(0.8);
+  filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(50deg) saturate(1000%) contrast(0.8);
 }

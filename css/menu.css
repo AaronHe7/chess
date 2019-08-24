@@ -1,0 +1,36 @@
+.menu-header {
+  margin-top: -0.2vh;
+  border-radius: 1.5vh 1.5vh 0 0;
+  height: 8vh;
+  line-height: 8vh;
+  vertical-align: middle;
+  text-align: center;
+  background-color: #454A54;
+  color: white;
+}
+
+.game-pause {
+  display: flex;
+  grid-column: 1;
+  grid-row: 1;
+  z-index: 2;
+
+  height: var(--board-length);
+  width: var(--board-length);
+  background:rgba(128, 128, 128, 0.5);
+}
+
+.game-menu {
+  height: 50vh;
+  width: 70vh;
+  border-radius: 1.5vh;
+  box-shadow: 3vh 4vh 2vh rgba(128, 128, 128, 0.8);
+
+  background-color: white;
+  margin: auto;
+  align-items: center;
+}
+
+.declare-winner {
+  display: none;
+}

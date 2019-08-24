@@ -2,14 +2,30 @@
 <html>
   <head>
     <title>Chess</title>
+    <meta charset='utf-8'>
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <link rel="stylesheet" type="text/css" href="css/piece-background.css">
+    <link rel="stylesheet" type="text/css" href="css/menu.css">
     <link rel="icon" href="images/wk.png">
   </head>
   <body>
-    <div class="board">
+    <div class="game">
+      <div class="game-pause">
+        <div class="game-menu">
+          <div class="start-game">
+            <h1 class="menu-header">Begin Game</h1>
+            <button onclick="startGame()">Start</button>
+          </div>
+          <div class="declare-winner">
+            <h1 class="menu-header winner-message"></h1>
+            <button onclick="startGame()">Replay</button>
+          </div>
+        </div>
+      </div>
+      <div class="board">
+      </div>
     </div>
     <script src="js/classes.js"></script>
-    <!-- <script src="js/play.js"></script> -->
+    <script src="js/index.js"></script>
   </body>
 </html>
