@@ -5,6 +5,8 @@ function ChessBoard() {
   this.turn = 'w';
   // Storing wheter certain pieces have moved is necessary for castling
   this.moveState = {};
+  this.pawnPromotion = null;
+  this.enPassantCandidate = null;
   this.init();
 }
 
@@ -164,8 +166,8 @@ ChessBoard.prototype.legalCastle = function(color, direction) {
 
 ChessBoard.prototype.castle = function(color, direction) {
   let info = this.castleInfo(color, direction);
-  this.movePiece(info.kingPos, info.kingEndPos, false);
-  this.movePiece(info.rookPos, info.rookEndPos, false);
+  this.movePiece(info.kingPos, info.kingEndPos);
+  this.movePiece(info.rookPos, info.rookEndPos);
 }
 
 
@@ -202,6 +204,8 @@ ChessBoard.prototype.legalMoves = function(coord, testForCheck = true) {
       diagonals.forEach(function(diagonal) {
         if (board.isPiece(diagonal) && color != board[diagonal][0]) {
           captures.push(diagonal);
+        } else if (board.enPassantCandidate && board.enPassantCandidate.moveCoord(direction, 0) == diagonal) {
+          captures.push('ep' + diagonal);
         }
       });
       break;
@@ -343,12 +347,36 @@ String.prototype.moveCoord = function(u, r) {
 
 
 ChessBoard.prototype.movePiece = function(pointA, pointB, recordMoves = true) {
-  if (recordMoves && pointA in this.moveState) {
-    this.moveState[pointA] = true;
+  // Record the moves to make sure that a special move is legal
+  if (recordMoves) {
+    this.pawnPromotion = null;
+    this.enPassantCandidate = null;
+
+    // Important for recording for king/rook moves
+    if (pointA in this.moveState) {
+      this.moveState[pointA] = true;
+    }
+    if (this[pointA][1] == 'p') {
+      // Check if pawn can be promoted
+      let promotionRank = this[pointA][0] == 'w' ? 8 : 1;
+      if (pointB[1] == promotionRank) {
+        this.pawnPromotion = pointB;
+      }
+      // Check if pawn is an 'en passant' target
+      let pawnRank = this[pointA][0] == 'w' ? 2 : 7;
+      let enPassantRank =  this[pointA][0] == 'w' ? 4 : 5;
+      if (pointA[1] == pawnRank && pointB[1] == enPassantRank) {
+        this.enPassantCandidate = pointB;
+      }
+    }
   }
-  
+
   this[pointB] = this[pointA];
   this[pointA] = null;
+}
+
+ChessBoard.prototype.changePiece = function(coord, newPiece) {
+  this[coord] = this[coord][0] + newPiece;
 }
 
 

@@ -4,11 +4,11 @@ body {
 }
 
 .game {
+  --board-length: 80.8vh;
   margin: auto;
-  height: 80vh;
-  width: 80vh;
+  height: var(--board-length);
+  width: var(--board-length);
   display: grid;
-  --board-length: 80vh + 5px;
 }
 
 .board {
@@ -28,7 +28,7 @@ body {
   position: relative;
   width: 10vh;
   height: 10vh;
-  border: 1px solid black; 
+  border: 0.05vh solid black; 
 }
 
 .dark {

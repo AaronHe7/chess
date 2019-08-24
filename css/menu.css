@@ -31,6 +31,27 @@
   align-items: center;
 }
 
-.declare-winner {
+.game-menu > div {
+  height: 50vh;
+  width: 70vh;
   display: none;
+}
+
+
+#start-game {
+  display: inline;
+}
+
+.promotion-images {
+  --promotion-image-size: 15vh;
+  display: flex;
+  width: 60vh;
+  height: var(--promotion-image-size);
+  margin: 10vh auto;
+}
+
+.promotion-images > img {
+  cursor: pointer;
+  height: var(--promotion-image-size);
+  width: var(--promotion-image-size);
 }

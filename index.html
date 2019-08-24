@@ -6,13 +6,14 @@
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <link rel="stylesheet" type="text/css" href="css/piece-background.css">
     <link rel="stylesheet" type="text/css" href="css/menu.css">
+    <link rel="stylesheet" type="text/css" href="css/sidebars.css">
     <link rel="icon" href="images/wk.png">
   </head>
   <body>
     <div class="game">
       <div class="game-pause">
         <div class="game-menu">
-          <div class="start-game">
+          <div id="start-game">
             <h1 class="menu-header">Begin Game</h1>
             <button onclick="startGame()">Start</button>
           </div>
@@ -20,10 +21,23 @@
             <h1 class="menu-header winner-message"></h1>
             <button onclick="startGame()">Replay</button>
           </div>
+          <div class="pawn-promotion">
+            <h1 class="menu-header">Promote your pawn</h1>
+            <div class="promotion-images">
+              <img alt="queen" src="images/wq.png" onclick="promotePawn('q')">
+              <img alt="rook" src="images/wr.png" onclick="promotePawn('r')">
+              <img alt="bishop" src="images/wb.png" onclick="promotePawn('b')">
+              <img alt="knight" src="images/wn.png" onclick="promotePawn('n')">
+            </div>
+          </div>
         </div>
       </div>
       <div class="board">
       </div>
+    </div>
+    <div class="captured">
+      <div class="captured-white"></div>
+      <div class="captured-black"></div>
     </div>
     <script src="js/classes.js"></script>
     <script src="js/index.js"></script>
