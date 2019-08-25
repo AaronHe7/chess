@@ -1,6 +1,6 @@
 // This chess game is made using object-oriented programming, using many methods
 
-function ChessBoard() {
+function Chess() {
   this.displaying = false;
   this.turn = 'w';
   // Storing wheter certain pieces have moved is necessary for castling
@@ -12,7 +12,7 @@ function ChessBoard() {
 
 
 // Allows the board to be indexed at any coordinate
-ChessBoard.prototype.init = function() {
+Chess.prototype.init = function() {
   let pieces = 'rnbqkbnr';
   for (let row = 1; row <= 8; row++) {
     for (let col = 0; col < 8; col++) {
@@ -33,7 +33,7 @@ ChessBoard.prototype.init = function() {
 }
 
 
-ChessBoard.prototype.addMarkers = function(side) {
+Chess.prototype.addMarkers = function(side) {
   let row1 = document.querySelectorAll('.board > div[class="1"] > div');
   let row8 = document.querySelectorAll('.board > div[class="8"] > div');
   let numberCol = document.querySelectorAll('.board > div > div[class^="a"]');
@@ -53,7 +53,7 @@ ChessBoard.prototype.addMarkers = function(side) {
 }
 
 // Display or update the chessboard on the browser
-ChessBoard.prototype.display = function() {
+Chess.prototype.display = function() {
   const board = document.querySelector('.board');
   // Create dom elements
   if (!this.displaying) {
@@ -88,17 +88,17 @@ ChessBoard.prototype.display = function() {
 
 
 // Puts each row in reverse order
-ChessBoard.prototype.flipBoard = function() {
+Chess.prototype.flipBoard = function(color = this.turn) {
   const board = document.querySelector('.board');
   const columns = document.querySelectorAll('.board > div');
   for (let i = 0; i < 8; i++) {
     board.appendChild(columns[7 - i]);
   }
-  this.addMarkers(this.turn);
+  this.addMarkers(color);
 }
 
 
-ChessBoard.prototype.isPiece = function(coord) {
+Chess.prototype.isPiece = function(coord) {
   return /[a-h][1-8]/.test(coord) && this[coord];
 }
 
@@ -108,7 +108,7 @@ Array.prototype.removeAt = function(index) {
 }
 
 
-ChessBoard.prototype.castleInfo = function(color, direction) {
+Chess.prototype.castleInfo = function(color, direction) {
   let piecePositions = {
     wrl: 'a1',
     wrr: 'h1',
@@ -137,7 +137,7 @@ ChessBoard.prototype.castleInfo = function(color, direction) {
   }
 }
 
-ChessBoard.prototype.legalCastle = function(color, direction) {
+Chess.prototype.legalCastle = function(color, direction) {
   let info = this.castleInfo(color, direction);
   if (this.inCheck(color) || info.kingMoved || info.rookMoved) {
     return false;
@@ -153,7 +153,7 @@ ChessBoard.prototype.legalCastle = function(color, direction) {
   // Check if the king will move through or into check
   for (let i = 1; i <= 2; i++) {
     let coordTest = info.kingPos.moveCoord(0, info.numericDirection * i);
-    let newBoard = new ChessBoard();
+    let newBoard = new Chess();
     Object.assign(newBoard, this);
     newBoard.movePiece(info.kingPos, coordTest, false);
     if (newBoard.inCheck(color)) {
@@ -164,14 +164,14 @@ ChessBoard.prototype.legalCastle = function(color, direction) {
 }
 
 
-ChessBoard.prototype.castle = function(color, direction) {
+Chess.prototype.castle = function(color, direction) {
   let info = this.castleInfo(color, direction);
   this.movePiece(info.kingPos, info.kingEndPos);
   this.movePiece(info.rookPos, info.rookEndPos);
 }
 
 
-ChessBoard.prototype.legalMoves = function(coord, testForCheck = true) {
+Chess.prototype.legalMoves = function(coord, testForCheck = true) {
   let board = this;
   let piece = this[coord];
   if (!piece)
@@ -259,7 +259,7 @@ ChessBoard.prototype.legalMoves = function(coord, testForCheck = true) {
     for (let key in validMoves) {
       for (let i = 0; i < validMoves[key].length; i++) {
         let move = validMoves[key][i];
-        let newBoard = new ChessBoard();
+        let newBoard = new Chess();
         Object.assign(newBoard, board);
         newBoard.movePiece(coord, move, false);
         let inCheck = newBoard.inCheck(color);
@@ -285,38 +285,43 @@ ChessBoard.prototype.legalMoves = function(coord, testForCheck = true) {
 }
 
 
-ChessBoard.prototype.findKing = function(color) {
+Chess.prototype.findKing = function(color) {
   return Object.keys(this).find(key => this[key] == color + 'k');
 }
 
 
 // If a player is in check and has no possible moves
-ChessBoard.prototype.winner = function() {
+Chess.prototype.winner = function() {
   var colors = ['b', 'w'];
   for (let i = 0; i < colors.length; i++) {
     let color = colors[i];
     let win = true;
+    let draw = true;
     let otherColor = color == 'b' ? 'w' : 'b';
     if (!this.inCheck(otherColor)) {
-      continue;
+      win = false;
     }
     for (let coord in this) {
       if (this.isPiece(coord) && this[coord][0] == otherColor) {
         let moves = this.legalMoves(coord);
         // If a piece has a valid move, break because the game is not lost
-        if (moves.moves.length > 0 || moves.captures.length > 0)
+        if (moves.moves.length > 0 || moves.captures.length > 0) {
           win = false;
+          draw = false;
+        }
       }
     }
     if (win)
       return color;
+    if (draw)
+      return otherColor + 'draw';
   }
   return null;
 }
 
 
 // Iterate through each piece and check if it can capture the king
-ChessBoard.prototype.inCheck = function(color) {
+Chess.prototype.inCheck = function(color) {
   for (let coord in this) {
     if (this.isPiece(coord) && this[coord][0] != color) {
       let legalMoves = this.legalMoves(coord, false);
@@ -346,7 +351,7 @@ String.prototype.moveCoord = function(u, r) {
 }
 
 
-ChessBoard.prototype.movePiece = function(pointA, pointB, recordMoves = true) {
+Chess.prototype.movePiece = function(pointA, pointB, recordMoves = true) {
   // Record the moves to make sure that a special move is legal
   if (recordMoves) {
     this.pawnPromotion = null;
@@ -371,29 +376,40 @@ ChessBoard.prototype.movePiece = function(pointA, pointB, recordMoves = true) {
     }
   }
 
+  let capturedPiece = this[pointB];
+
   this[pointB] = this[pointA];
   this[pointA] = null;
+
+  return capturedPiece;
 }
 
-ChessBoard.prototype.changePiece = function(coord, newPiece) {
+Chess.prototype.changePiece = function(coord, newPiece) {
   this[coord] = this[coord][0] + newPiece;
 }
 
 
 // Get DOM element at a coordinate
-ChessBoard.prototype.elementAt = function(coord) {
+Chess.prototype.elementAt = function(coord) {
   return document.querySelector(`.${coord}`)
 }
 
 
-// Remove all shown moves or captures
-ChessBoard.prototype.cleanUp = function(check = false) {
+// Remove all classes from board
+Chess.prototype.cleanUp = function(...classes) {
   let squareDivs = document.querySelectorAll('.board > div > div');
   for (let i = 0; i < squareDivs.length; i++) {
-    if (check) {
-      squareDivs[i].classList.remove('check');
-    }
-    squareDivs[i].classList.remove('move', 'capture', 'selected', 'castle');
+    squareDivs[i].classList.remove(...classes);
   }
 }
 
+Chess.prototype.countPieces = function() {
+  let result = {}
+  for (coord in this) {
+    if (this.isPiece(coord)) {
+      let piece = this[coord];
+      result[piece] = result[piece] == undefined ? 1 : result[piece] + 1;
+    }
+  }
+  return result;
+}

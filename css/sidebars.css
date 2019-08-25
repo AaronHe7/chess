@@ -1,0 +1,12 @@
+.tray {
+  height: 80.8vh;
+  width: 20.5vh;
+  border-radius: 1vh;
+  box-shadow: 0 0 2vh gray;
+  background-color: lightgray;
+}
+
+.tray > img {
+  height: 10vh;
+  width: 10vh;
+}

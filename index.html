@@ -3,7 +3,7 @@
   <head>
     <title>Chess</title>
     <meta charset='utf-8'>
-    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/game-board.css">
     <link rel="stylesheet" type="text/css" href="css/piece-background.css">
     <link rel="stylesheet" type="text/css" href="css/menu.css">
     <link rel="stylesheet" type="text/css" href="css/sidebars.css">
@@ -11,35 +11,63 @@
   </head>
   <body>
     <div class="game">
-      <div class="game-pause">
-        <div class="game-menu">
-          <div id="start-game">
-            <h1 class="menu-header">Begin Game</h1>
-            <button onclick="startGame()">Start</button>
-          </div>
-          <div class="declare-winner">
-            <h1 class="menu-header winner-message"></h1>
-            <button onclick="startGame()">Replay</button>
-          </div>
-          <div class="pawn-promotion">
-            <h1 class="menu-header">Promote your pawn</h1>
-            <div class="promotion-images">
-              <img alt="queen" src="images/wq.png" onclick="promotePawn('q')">
-              <img alt="rook" src="images/wr.png" onclick="promotePawn('r')">
-              <img alt="bishop" src="images/wb.png" onclick="promotePawn('b')">
-              <img alt="knight" src="images/wn.png" onclick="promotePawn('n')">
+      <div class="left-sidebar">
+        <div class="tray"></div>
+      </div>
+      <div class="chess-board">
+        <div class="game-pause">
+          <div class="game-menu">
+            <div id="start-game">
+              <h1 class="menu-header">Begin Game</h1>
+              <p class="description">
+                Chess is a two-player strategy game, where each player must attempt to win by checkmating the opponent's king, 
+                achieved by pressuring the king under capture in an inescapable position.</p>
+              </p>
+              <div class="button-choices">
+                <button class="btn" onclick="startGame('player')">Play 1v1</button>
+                <button class="btn" onclick="startGame('computer')">Play Computer</button>
+              </div>
+            </div>
+            <div class="color-choices">
+              <h1 class="menu-header">Choose a Color</h1>
+              <div class="colors">
+                <img src="images/wk.png" onclick="playAs('w')">
+                <img src="images/bk.png" onclick="playAs('b')">
+              </div>
+            </div>
+            <div class="declare-winner">
+              <h1 class="menu-header winner-message"></h1>
+              <div class="view-board">
+                <button class="btn-small" onclick="viewBoard()">View Board</button>
+              </div>
+              <div class="title">Play Again</div>
+              </p>
+              <div class="button-choices">
+                <button class="btn" onclick="startGame('player')">Play 1v1</button>
+                <button class="btn" onclick="startGame('computer')">Play Computer</button>
+              </div>
+            </div>
+            <div class="pawn-promotion">
+              <h1 class="menu-header">Promote your pawn</h1>
+              <div class="promotion-images">
+                <img alt="queen" src="images/wq.png" onclick="promotePawn('q')">
+                <img alt="rook" src="images/wr.png" onclick="promotePawn('r')">
+                <img alt="bishop" src="images/wb.png" onclick="promotePawn('b')">
+                <img alt="knight" src="images/wn.png" onclick="promotePawn('n')">
+              </div>
             </div>
           </div>
+          <button class="btn-small back" onclick="displayMenu('.declare-winner')">Back</button>
+        </div>
+        <div class="board">
         </div>
       </div>
-      <div class="board">
+      <div class="right-sidebar">
+        <div class="tray"></div>
       </div>
     </div>
-    <div class="captured">
-      <div class="captured-white"></div>
-      <div class="captured-black"></div>
-    </div>
     <script src="js/classes.js"></script>
+    <script src="js/ai-algorithm.js"></script>
     <script src="js/index.js"></script>
   </body>
 </html>

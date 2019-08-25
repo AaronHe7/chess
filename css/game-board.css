@@ -4,10 +4,17 @@ body {
 }
 
 .game {
+  display: flex;
+  margin-top: 50px;
+  align-items: center;
+  justify-content: center;
+}
+
+.chess-board {
   --board-length: 80.8vh;
-  margin: auto;
   height: var(--board-length);
   width: var(--board-length);
+  margin: 0 5vh;
   display: grid;
 }
 
@@ -32,11 +39,11 @@ body {
 }
 
 .dark {
-  background-color: #BBC557
+  background-color: #BBC557;
 }
 
 .light {
-  background-color: #EEECD3
+  background-color: #EEECD3;
 }
 
 .board > div > div:hover {
@@ -59,30 +66,26 @@ body {
   margin: 0.5vh;
 }
 
+.target {
+  filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(50deg) saturate(1000%) contrast(0.8);
+}
+
 .move {
   cursor: pointer;
-  -webkit-filter: grayscale(100%) brightness(30%) sepia(100%) hue-rotate(-180deg) saturate(0%) contrast(0.8);
   filter: grayscale(100%) brightness(30%) sepia(100%) hue-rotate(-180deg) saturate(700%) contrast(0.8);
 }
 
 .capture {
   cursor: pointer;
-  -webkit-filter: invert(40%) grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(400%) contrast(2);
   filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8);
 }
 
 .check {
-  -webkit-filter: invert(40%) grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(400%) contrast(2);
   filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(0.8);
 }
 
 .castle {
   cursor: pointer;
-  -webkit-filter: grayscale(100%) brightness(30%) sepia(100%) hue-rotate(-180deg) saturate(0%) contrast(0.8);
   filter: grayscale(100%) brightness(30%) sepia(100%) hue-rotate(-180deg) saturate(700%) contrast(0.8);
 }
 
-.target {
-  -webkit-filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(50deg) saturate(1000%) contrast(0.8);
-  filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(50deg) saturate(1000%) contrast(0.8);
-}
