@@ -6,10 +6,6 @@ var playerColor;
 board.display();
 board.addMarkers('w');
 
-setInterval(function() {
-  
-}, 100);
-
 function startGame(choice) {
   againstComp = choice == 'computer' ? true : false;
   document.querySelector('.board').innerHTML = '';
@@ -33,10 +29,8 @@ function playAs(color) {
 }
 
 function computerMove() {
-  let move = board.getMove(board.turn);
-  setTimeout(function() {
-    animateMove(move[0], move[1], false);
-  }, 700);
+  let move = board.getMove(board.turn).move;
+  animateMove(move[0], move[1], false);
 }
 
 function declareWinner(message) {
@@ -111,22 +105,9 @@ function animateMove(pointA, pointB, flip = true) {
     if (board.enPassantTarget) {
       capturedPiece = board[board.enPassantTarget];
       board[board.enPassantTarget] = null;
-    } else if (pointB.slice(0, 2) == 'ep') {
-      let direction = board.turn == 'w' ? 1 : -1;
-      pointB = pointB.slice(2);
-      
-      let enPassantTarget = pointB.moveCoord(-direction, 0);
-      capturedPiece = board[enPassantTarget];
-      board[enPassantTarget] = null;
     }
 
-    // Castling
-    if (pointB[1] == 'c') {
-      board.castle(board.turn, pointB[0]);
-      pointB = pointB.slice(2);
-    } else {
-      capturedPiece = board.movePiece(pointA, pointB);
-    }
+    capturedPiece = board.movePiece(pointA, pointB);
     
     // Promoting
     if (board.pawnPromotion) {
@@ -135,6 +116,10 @@ function animateMove(pointA, pointB, flip = true) {
       } else {
         promotePawn('q');
       }
+    }
+
+    if (pointB.slice(0, 2) == 'ep' || pointB[1] == 'c') {
+      pointB = pointB.slice(2);
     }
     
     board.elementAt(pointA).classList.add('target');
@@ -199,9 +184,11 @@ function displayEvents(e) {
     let move = castleMove ? castleMove + target.classList[0] : target.classList[0];
     
     animateMove(board.selected, move, !againstComp);
-    if (againstComp && !board.pawnPromotion) {
-      computerMove();
-    }
+    setTimeout(function() {
+      if (againstComp && !board.pawnPromotion) {
+        computerMove();
+      }
+    }, 650);
     
 
   // Visually show all moves and captures

@@ -11,7 +11,7 @@ body {
 }
 
 .chess-board {
-  --board-length: 80.8vh;
+  --board-length: 80vh;
   height: var(--board-length);
   width: var(--board-length);
   margin: 0 5vh;
@@ -35,7 +35,6 @@ body {
   position: relative;
   width: 10vh;
   height: 10vh;
-  border: 0.05vh solid black; 
 }
 
 .dark {

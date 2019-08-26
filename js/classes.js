@@ -32,6 +32,15 @@ Chess.prototype.init = function() {
   }
 }
 
+Chess.prototype.getCopy = function(option = 'shallow') {
+  let copy = new Chess();
+  Object.assign(copy, this);
+  if (option == 'deep') {
+    copy.moveState = JSON.parse(JSON.stringify(this.moveState));
+  }
+  return copy;
+}
+
 
 Chess.prototype.addMarkers = function(side) {
   let row1 = document.querySelectorAll('.board > div[class="1"] > div');
@@ -99,7 +108,7 @@ Chess.prototype.flipBoard = function(color = this.turn) {
 
 
 Chess.prototype.isPiece = function(coord) {
-  return /[a-h][1-8]/.test(coord) && this[coord];
+  return this[coord] && /[a-h][1-8]/.test(coord);
 }
 
 
@@ -153,8 +162,7 @@ Chess.prototype.legalCastle = function(color, direction) {
   // Check if the king will move through or into check
   for (let i = 1; i <= 2; i++) {
     let coordTest = info.kingPos.moveCoord(0, info.numericDirection * i);
-    let newBoard = new Chess();
-    Object.assign(newBoard, this);
+    let newBoard = board.getCopy();
     newBoard.movePiece(info.kingPos, coordTest, false);
     if (newBoard.inCheck(color)) {
       return false;
@@ -259,8 +267,7 @@ Chess.prototype.legalMoves = function(coord, testForCheck = true) {
     for (let key in validMoves) {
       for (let i = 0; i < validMoves[key].length; i++) {
         let move = validMoves[key][i];
-        let newBoard = new Chess();
-        Object.assign(newBoard, board);
+        let newBoard = this.getCopy();
         newBoard.movePiece(coord, move, false);
         let inCheck = newBoard.inCheck(color);
         if (newBoard.inCheck(color)) {
@@ -281,12 +288,15 @@ Chess.prototype.legalMoves = function(coord, testForCheck = true) {
     })
   }
   
-  return validMoves
+  return validMoves;
 }
 
 
 Chess.prototype.findKing = function(color) {
-  return Object.keys(this).find(key => this[key] == color + 'k');
+  let kingPos = Object.keys(this).find(key => this[key] == color + 'k');
+  if (kingPos)
+    return kingPos
+  return false;
 }
 
 
@@ -297,6 +307,7 @@ Chess.prototype.winner = function() {
     let color = colors[i];
     let win = true;
     let draw = true;
+    let kingExists = false;
     let otherColor = color == 'b' ? 'w' : 'b';
     if (!this.inCheck(otherColor)) {
       win = false;
@@ -309,9 +320,11 @@ Chess.prototype.winner = function() {
           win = false;
           draw = false;
         }
+        if (this[coord][1] == 'k')
+          kingExists = true;
       }
     }
-    if (win)
+    if (win || !kingExists)
       return color;
     if (draw)
       return otherColor + 'draw';
@@ -325,7 +338,8 @@ Chess.prototype.inCheck = function(color) {
   for (let coord in this) {
     if (this.isPiece(coord) && this[coord][0] != color) {
       let legalMoves = this.legalMoves(coord, false);
-      if (legalMoves.captures.includes(this.findKing(color))) {
+      let kingPos = this.findKing(color)
+      if (!kingPos || legalMoves.captures.includes(kingPos)) {
         return true;
       }
     }
@@ -352,7 +366,28 @@ String.prototype.moveCoord = function(u, r) {
 
 
 Chess.prototype.movePiece = function(pointA, pointB, recordMoves = true) {
-  // Record the moves to make sure that a special move is legal
+  let board = this;
+  let color = this[pointA][0];
+  let piece = this[pointA][1];
+  let capturedPiece = this[pointB];
+
+  // Check for castling or en passant
+  switch (pointB.slice(0, 2)) {
+    case 'lc':
+    case 'rc':
+      board.castle(color, pointB[0]);
+      capturedPiece = null;
+      break;
+    case 'ep':
+      let direction = board.turn == 'w' ? 1 : -1;
+      
+      let enPassantTarget = pointB.moveCoord(-direction, 0);
+      capturedPiece = board[enPassantTarget];
+      board[enPassantTarget] = null;
+      break;
+  }
+
+  // Record certain moves
   if (recordMoves) {
     this.pawnPromotion = null;
     this.enPassantCandidate = null;
@@ -361,22 +396,20 @@ Chess.prototype.movePiece = function(pointA, pointB, recordMoves = true) {
     if (pointA in this.moveState) {
       this.moveState[pointA] = true;
     }
-    if (this[pointA][1] == 'p') {
+    if (piece == 'p') {
       // Check if pawn can be promoted
-      let promotionRank = this[pointA][0] == 'w' ? 8 : 1;
+      let promotionRank = color == 'w' ? 8 : 1;
       if (pointB[1] == promotionRank) {
         this.pawnPromotion = pointB;
       }
       // Check if pawn is an 'en passant' target
-      let pawnRank = this[pointA][0] == 'w' ? 2 : 7;
-      let enPassantRank =  this[pointA][0] == 'w' ? 4 : 5;
+      let pawnRank = color == 'w' ? 2 : 7;
+      let enPassantRank =  color == 'w' ? 4 : 5;
       if (pointA[1] == pawnRank && pointB[1] == enPassantRank) {
         this.enPassantCandidate = pointB;
       }
     }
   }
-
-  let capturedPiece = this[pointB];
 
   this[pointB] = this[pointA];
   this[pointA] = null;
