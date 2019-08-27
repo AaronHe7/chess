@@ -148,18 +148,21 @@ Chess.prototype.positionalEvaluation = function(coord) {
     color: this[coord][0],
     type: this[coord][1]
   }
-  let data = Object.assign({}, evaluationData);
+  let data = evaluationData;
   
   let evaluationArray = data[piece.type];
-  if (piece.type == 'k' && this.isEndGame()) {
+  if (piece.type == 'k' && this.isEndGame()) 
     evaluationArray = data['k endgame'];
-  }
-  if (piece.color == 'b') {
-    evaluationArray = evaluationArray.reverse();
-  }
-  let numericCoord = [8 - parseInt(coord[1]), coord.charCodeAt(0) - 97];
   
+  if (piece.color == 'b')
+    evaluationArray = evaluationArray.reverse();
+ 
+  let numericCoord = [8 - parseInt(coord[1]), coord.charCodeAt(0) - 97];
   let positionScore = evaluationArray[numericCoord[0]][numericCoord[1]];
+
+  if (piece.color == 'b')
+    evaluationArray = evaluationArray.reverse();
+  
   return positionScore;
 }
 
