@@ -18,11 +18,11 @@ function clearBoard() {
 }
 
 function startGame(choice) {
-  if (choice == 'player') 
+  if (choice == 'player')
     matchStarted = true;
   againstComp = choice == 'computer' ? true : false;
   clearBoard();
-  
+
   if (againstComp)
     displayMenu('.color-choices');
   document.addEventListener('click', displayEvents);
@@ -30,13 +30,15 @@ function startGame(choice) {
 
 function compVsComp() {
   clearMenu();
-  againstComp = true;
-  setInterval(function() {
+  let interval = setInterval(function() {
     computerMove();
     if (board.pawnPromotion) {
-      promotePawn('q');
+      promotePawn('q', false);
     }
-  }, 1500);
+    if (board.winner() || board.threeFold()) {
+      clearInterval(interval)
+    }
+  }, 400);
 }
 
 function playAs(color) {
@@ -87,9 +89,9 @@ function promoteMenu(color) {
   };
 }
 
-function promotePawn(piece) {
+function promotePawn(piece, flip) {
   board.changePiece(board.pawnPromotion, piece);
-  if (!againstComp)
+  if (!againstComp && flip)
     board.flipBoard();
   clearMenu();
   board.display();
@@ -126,7 +128,7 @@ function animateMove(pointA, pointB, flip = true) {
       capturedPiece = board[board.enPassantTarget];
       board[board.enPassantTarget] = null;
     }
-    
+
     // Promoting
     if (board.pawnPromotion) {
       if (!playerColor || board[board.pawnPromotion][0] == playerColor) {
@@ -139,14 +141,14 @@ function animateMove(pointA, pointB, flip = true) {
     if (pointB.slice(0, 2) == 'ep' || pointB[1] == 'c') {
       pointB = pointB.slice(2);
     }
-    
+
     board.elementAt(pointA).classList.add('target');
     board.elementAt(pointB).classList.add('target');
   }
   if (!board.pawnPromotion)
     board.turn = board.turn == 'b' ? 'w' : 'b';
 
-  setTimeout(function() { 
+  setTimeout(function() {
     board.display();
     if (capturedPiece)
       addCapturedPiece(capturedPiece);
@@ -159,11 +161,15 @@ function animateMove(pointA, pointB, flip = true) {
     }
 
     setTimeout(function() {
-      // If a player wins, declare it
+      // If a player wins or draws, declare it
       let winner = board.winner();
+      if (board.threeFold()) {
+    		declareWinner('Draw - Threefold repitition');
+        return;
+    	}
       if (winner) {
-        if (winner.slice(1) == 'draw' && winner[0] == board.turn) {
-          declareWinner('Draw');
+        if (winner == 'draw') {
+          declareWinner('Draw - Stalemate');
         } else if (winner == 'w' || winner == 'b') {
           if (againstComp) {
             if (winner == playerColor) {
@@ -179,7 +185,7 @@ function animateMove(pointA, pointB, flip = true) {
         return;
       }
       if (flip && !board.pawnPromotion) {
-        board.flipBoard(); 
+        board.flipBoard();
       }
       let otherColor = board.turn == 'w' ? 'b' : 'w';
       if (board.turn == drawOffer && confirm(colors[otherColor] + ' offers a draw. Accept?')) {
@@ -187,7 +193,7 @@ function animateMove(pointA, pointB, flip = true) {
       }
       drawOffer = false;
     }, 300);
-  }, 300); 
+  }, 300);
 }
 
 
@@ -198,7 +204,7 @@ function displayEvents(e) {
     var isMove = target.classList.contains('move') || target.classList.contains('capture');
   } else {
     var coord = null;
-    board.selected = null; 
+    board.selected = null;
   }
 
   // Delete all the 'move' or 'capture' classes
@@ -209,7 +215,7 @@ function displayEvents(e) {
     // Check if the move is a castle
     let castleMove = /[lr]c/.exec(target.classList);
     let move = castleMove ? castleMove + target.classList[0] : target.classList[0];
-    
+
     animateMove(board.selected, move, !againstComp);
     setTimeout(function() {
       if (againstComp && !board.pawnPromotion && !board.winner()) {
@@ -218,7 +224,7 @@ function displayEvents(e) {
     }, 650);
 
   // Visually show all moves and captures
-  } else if (board.isPiece(coord) && board[coord][0] == board.turn && coord != board.selected) {
+} else if (board.isPiece(coord) && board[coord][0] == board.turn && coord != board.selected) {
     if (againstComp && playerColor != board[coord][0]) {
       return;
     }
@@ -227,7 +233,7 @@ function displayEvents(e) {
     target.classList.add('selected');
     legalMoves = board.legalMoves(coord);
     board.enPassantTarget = null;
-    
+
     legalMoves.moves.forEach(function(move) {
       if (move[1] == 'c') {
         board.elementAt(move.slice(2)).classList.add('move');

@@ -1,35 +1,25 @@
 var timeTaken = 0;
-var depth = 3;
+var depth = 2;
 Chess.prototype.getMove = function(color) {
   var start = new Date().getTime();
   let move = this.minimax(color, depth);
+  console.log(color + ' moved with score ' + move.score)
   var end = new Date().getTime();
   timeTaken = end - start;
-  
-  // Adjust layer search based on how much time it took
-  if (timeTaken > 1500) {
-    depth--;
-  } else if (timeTaken < 100) {
-    depth++;
-  }
+
   return move;
 }
 
-Chess.prototype.minimax = function(color, depth, alpha = -Infinity, beta = Infinity, maximizingPlayer = true) {
+Chess.prototype.minimax = function(color, depth, maximizingPlayer = true) {
   // If the program runs out of depth, return the current score
   if (depth == 0) {
-    return { score: this.boardScore(color, maximizingPlayer) }
+    return { score: this.getBoardScore(color, maximizingPlayer) }
   }
 
   var legalMoves = [];
   var otherColor = color == 'b' ? 'w' : 'b';
-  maximizingColor = null;
-
-  if (maximizingPlayer) {
-    maximizingColor = color;
-  } else {
-    maximizingColor = color == 'b' ? 'w' : 'b';
-  }
+  var maximizingColor = maximizingPlayer ? color : otherColor;
+  var board = this;
 
   for (let coord in this) {
     if (this.isPiece(coord)) {
@@ -37,16 +27,21 @@ Chess.prototype.minimax = function(color, depth, alpha = -Infinity, beta = Infin
         color: this[coord][0],
         type: this[coord][1]
       }
-      
-      if (piece.color == color) {
-        let pieceMoves = this.legalMoves(coord);
 
-        pieceMoves.moves.forEach(function(move) {
+      if (piece.color == color) {
+        let pieceMoves = this.legalMoves(coord, depth == 2);
+
+        for (let move of pieceMoves.moves) {
           legalMoves.push([coord, move]);
-        });
-        pieceMoves.captures.forEach(function(capture) {
+        }
+        for (let capture of pieceMoves.captures) {
           legalMoves.push([coord, capture]);
-        });
+		  // Make sure that the king does not move into check
+          if (board[capture] && board[capture][1] == 'k') {
+            //let score = maximizingPlayer ? Infinity : -Infinity;
+            //return { move: [coord, capture], score: score}
+          }
+        }
       }
     }
   }
@@ -54,58 +49,48 @@ Chess.prototype.minimax = function(color, depth, alpha = -Infinity, beta = Infin
 
   // Recursively find the score of every legal move
   var board = this;
-  var optimalMoves = null;
-
-  for (let i = 0; i < legalMoves.length; i++) {
-    let action = legalMoves[i];
+  var optimalMoves = [];
+  var bestScore = maximizingPlayer ? -Infinity : Infinity;
+  for (let action of legalMoves) {
     let newBoard = board.getCopy('deep');
     newBoard.movePiece(action[0], action[1]);
-
+    // Avoid threefold repititions
+    if (newBoard.threeFold()) {
+        return { move: action, score: 0 }
+    }
     let move = {};
     move.move = action;
-    move.score = newBoard.minimax(otherColor, depth - 1, alpha, beta, !maximizingPlayer).score;
+    move.score = newBoard.minimax(otherColor, depth - 1, !maximizingPlayer).score;
 
     if (maximizingPlayer) {
       // Find max move score
-      let bestScore = -Infinity;
       if (move.score > bestScore) {
         optimalMoves = [move];
+		bestScore = move.score;
       } else if (move.score == bestScore) {
         optimalMoves.push(move);
       }
-      bestScore = Math.max(bestScore, move.score);
-      alpha = Math.max(alpha, bestScore);
-      if (alpha >= beta) {
-        break;
-      }
-    // Find min move score
-    } else { 
-      let bestScore = Infinity;
-      
+    } else {
       if (move.score < bestScore) {
         optimalMoves = [move];
+		bestScore = move.score;
       } else if (move.score == bestScore) {
         optimalMoves.push(move);
-      }
-      bestScore = Math.min(bestScore, move.score);
-      beta = Math.min(bestScore, beta);
-      if (alpha >= beta) {
-        break;
       }
     }
   }
 
   // If there is no optimal move, assume terminal state
-  if (optimalMoves == null) {
+  if (optimalMoves.length == 0) {
     console.log('a');
     let winner = this.winner();
     if (winner == 'draw') {
       return { score: 0 }
     }
     if (maximizingColor == color) {
-      return { score: 20000 }
+      return { score: Infinity }
     } else {
-      return { score: -20000 }
+      return { score: -Infinity }
     }
   }
 
@@ -115,13 +100,13 @@ Chess.prototype.minimax = function(color, depth, alpha = -Infinity, beta = Infin
 }
 
 
-/*** 
+/***
 Board Evaluation Functions
 Credit: https://www.chessprogramming.org/Simplified_Evaluation_Function
  ***/
 
 // Gets score of maximizing player based on pieces and positions
-Chess.prototype.boardScore = function(color, maximizingPlayer) {
+Chess.prototype.getBoardScore = function(color, maximizingPlayer) {
   let score = 0;
   let pieceRating = {
     p: 100,
@@ -156,20 +141,20 @@ Chess.prototype.positionalEvaluation = function(coord) {
     type: this[coord][1]
   }
   let data = evaluationData;
-  
+
   let evaluationArray = data[piece.type];
-  if ((piece.type == 'k' || piece.type == 'p') && this.isEndGame(piece.color)) 
-    evaluationArray = data['k endgame'];
-  
+  if ((piece.type == 'k' || piece.type == 'p') && this.isEndGame(piece.color))
+    evaluationArray = data[piece.type + ' endgame'];
+
   if (piece.color == 'b')
     evaluationArray = evaluationArray.reverse();
- 
+
   let numericCoord = [8 - parseInt(coord[1]), coord.charCodeAt(0) - 97];
   let positionScore = evaluationArray[numericCoord[0]][numericCoord[1]];
 
   if (piece.color == 'b')
     evaluationArray = evaluationArray.reverse();
-  
+
   return positionScore;
 }
 
@@ -179,7 +164,7 @@ Chess.prototype.isEndGame = function(color) {
   let count = this.countPieces();
   if (count[other + 'q'] == 0) {
     return true;
-  } else if (count[other = 'n'] + count[other + 'b'] <= 1) {
+  } else if (count[other + 'n'] + count[other + 'b'] <= 1 && count[other + 'r'] <= 1) {
     return true;
   }
   return false;
