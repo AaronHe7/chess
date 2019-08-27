@@ -7,6 +7,7 @@
     <link rel="stylesheet" type="text/css" href="css/piece-background.css">
     <link rel="stylesheet" type="text/css" href="css/menu.css">
     <link rel="stylesheet" type="text/css" href="css/sidebars.css">
+    <link rel="stylesheet" type="text/css" href="css/buttons.css">
     <link rel="icon" href="images/wk.png">
   </head>
   <body>
@@ -23,14 +24,14 @@
                 Chess is a two-player strategy game, where each player must attempt to win by checkmating the opponent's king, 
                 achieved by pressuring the king under capture in an inescapable position.</p>
               </p>
-              <div class="button-choices">
+              <div class="center">
                 <button class="btn" onclick="startGame('player')">Play 1v1</button>
                 <button class="btn" onclick="startGame('computer')">Play Computer</button>
               </div>
             </div>
             <div class="color-choices">
               <h1 class="menu-header">Choose a Color</h1>
-              <div class="colors">
+              <div class="center colors">
                 <img src="images/wk.png" onclick="playAs('w')">
                 <img src="images/bk.png" onclick="playAs('b')">
               </div>
@@ -42,7 +43,7 @@
               </div>
               <div class="title">Play Again</div>
               </p>
-              <div class="button-choices">
+              <div class="button-choices center">
                 <button class="btn" onclick="startGame('player')">Play 1v1</button>
                 <button class="btn" onclick="startGame('computer')">Play Computer</button>
               </div>
@@ -66,6 +67,11 @@
         <div class="tray"></div>
       </div>
     </div>
+    <div class="center">
+      <button class="btn-danger" onclick="resign()">Resign</button>
+      <button class="btn-neutral" onclick="draw()">Offer Draw</button>
+    </div>
+    <script type="text/javascript" src="js/json/positional-evaluation.json"></script>
     <script src="js/classes.js"></script>
     <script src="js/ai-algorithm.js"></script>
     <script src="js/index.js"></script>

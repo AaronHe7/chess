@@ -3,16 +3,19 @@ Chess.prototype.getMove = function(color) {
 }
 
 Chess.prototype.minimax = function(color, depth, maximizingPlayer = true) {
+  // If the program runs out of depth, return the current score
+  if (depth == 0) {
+    return { score: this.boardScore(color, maximizingPlayer) }
+  }
+
   var legalMoves = [];
-  let boardRating = 0;
   var otherColor = color == 'b' ? 'w' : 'b';
-  let pieceRating = {
-    p: 1,
-    n: 3,
-    b: 3,
-    r: 5,
-    q: 9,
-    k: 100
+  
+  maximizingColor = null;
+  if (maximizingPlayer) {
+    maximizingColor = color;
+  } else {
+    maximizingColor = color == 'b' ? 'w' : 'b';
   }
 
   for (let coord in this) {
@@ -22,37 +25,21 @@ Chess.prototype.minimax = function(color, depth, maximizingPlayer = true) {
         type: this[coord][1]
       }
       
-      // Calculate how well the position of the maximizing player is
-      if (depth == 0) {
-        if ((maximizingPlayer && piece.color == color) || (!maximizingPlayer && piece.color != color)) {
-          boardRating += pieceRating[piece.type];
-        } else {
-          boardRating -= pieceRating[piece.type];
-        }
-      }
-      // Put each possible legal move in an array
-      else {
-        if (piece.color == color) {
-          let pieceMoves = this.legalMoves(coord);
+      if (piece.color == color) {
+        let pieceMoves = this.legalMoves(coord);
 
-          pieceMoves.moves.forEach(function(move) {
-            legalMoves.push([coord, move]);
-          });
-          pieceMoves.captures.forEach(function(capture) {
-            legalMoves.push([coord, capture]);
-          });
-        }
+        pieceMoves.moves.forEach(function(move) {
+          legalMoves.push([coord, move]);
+        });
+        pieceMoves.captures.forEach(function(capture) {
+          legalMoves.push([coord, capture]);
+        });
       }
     }
   }
 
 
-  // If the program runs out of depth, return the current score
-  if (depth == 0) {
-    return { score: boardRating }
-  }
-  
-  // Get score of all moves
+  // Recursively find the score of every legal move
   var moves = [];
   var board = this;
 
@@ -62,12 +49,14 @@ Chess.prototype.minimax = function(color, depth, maximizingPlayer = true) {
 
     let newBoard = board.getCopy('deep');
     newBoard.movePiece(action[0], action[1]);
+
     move.score = newBoard.minimax(otherColor, depth - 1, !maximizingPlayer).score;
     moves.push(move);
   });
   
-  // Get the highest or lowest score of each move
+
   var optimalMoves = null;
+
   moves.forEach(function(move) {
     // If it's the maximizing player, find the highest score
     if (maximizingPlayer) {
@@ -92,13 +81,95 @@ Chess.prototype.minimax = function(color, depth, maximizingPlayer = true) {
     if (winner == 'draw') {
       return { score: 0 }
     }
-    if ((maximizingPlayer && winner == color) || (!maximizingPlayer && winner != color)) {
-      return { score: 100 }
+    if (maximizingColor == color) {
+      return { score: 20000 }
     } else {
-      return { score: -100 }
+      return { score: -20000 }
     }
   }
 
+  // Add entropy to avoid repitition
+  if (depth == 2) {
+    let range = 25;
+    let boardScore = this.boardScore(color, maximizingPlayer);
+    if (boardScore > 1000) {
+      range = boardScore/40;
+    }
+    var bestMoveScore = maximizingPlayer ? Math.max(...moves.map(move => move.score)) :  Math.min(...moves.map(move => move.score));
+    if (maximizingPlayer) {
+      optimalMoves = moves.filter(move => move.score + range >= bestMoveScore);
+    } else {
+      optimalMoves = moves.filter(move => move.score - range <= bestMoveScore);
+    }
+  }
   // Get a random optimal move
-  return optimalMoves[Math.floor(Math.random() * optimalMoves.length)];
+  let optimalMove = optimalMoves[Math.floor(Math.random() * optimalMoves.length)]
+  return optimalMove;
+}
+
+
+/*** 
+Board Evaluation Functions
+Credit: https://www.chessprogramming.org/Simplified_Evaluation_Function
+ ***/
+
+// Gets score of maximizing player based on pieces and positions
+Chess.prototype.boardScore = function(color, maximizingPlayer) {
+  let score = 0;
+  let pieceRating = {
+    p: 100,
+    n: 320,
+    b: 330,
+    r: 500,
+    q: 900,
+    k: 20000
+  }
+  for (let coord in this) {
+    if (this.isPiece(coord)) {
+      let piece = {
+        color: this[coord][0],
+        type: this[coord][1]
+      }
+      let positionScore = this.positionalEvaluation(coord);
+      if ((maximizingPlayer && piece.color == color) || (!maximizingPlayer && piece.color != color)) {
+        score += (pieceRating[piece.type] + positionScore);
+      } else {
+        score -= (pieceRating[piece.type] + positionScore);
+      }
+    }
+  }
+  return score;
+}
+
+// By evaluating positions, the program is encouraged to move pieces into favorable positions
+// Data is found in json/position-evaluation.json
+Chess.prototype.positionalEvaluation = function(coord) {
+  let piece = {
+    color: this[coord][0],
+    type: this[coord][1]
+  }
+  let data = Object.assign({}, evaluationData);
+  
+  let evaluationArray = data[piece.type];
+  if (piece.type == 'k' && this.isEndGame()) {
+    evaluationArray = data['k endgame'];
+  }
+  if (piece.color == 'b') {
+    evaluationArray = evaluationArray.reverse();
+  }
+  let numericCoord = [8 - parseInt(coord[1]), coord.charCodeAt(0) - 97];
+  
+  let positionScore = evaluationArray[numericCoord[0]][numericCoord[1]];
+  return positionScore;
+}
+
+// Endgame happens if both sides have no queens or if both sides have zero or one minor pieces
+Chess.prototype.isEndGame = function() {
+  let count = this.countPieces();
+  if (count['bq'] == 0 && count['wq'] == 0) {
+    return true;
+  } else if (count['wn'] + count['wb'] <= 1 && count['bn'] + count['bb'] <= 1) {
+    return true;
+  }
+  return false;
 }

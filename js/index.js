@@ -1,12 +1,15 @@
 var board = new Chess();
-var capturedPiece;
-var againstComp;
-var playerColor;
+var capturedPiece, againstComp, playerColor, matchStarted, drawOffer;
+var colors = {
+  w: 'White',
+  b: 'Black'
+}
 
 board.display();
 board.addMarkers('w');
 
 function startGame(choice) {
+  matchStarted = true;
   againstComp = choice == 'computer' ? true : false;
   document.querySelector('.board').innerHTML = '';
   board = new Chess();
@@ -146,19 +149,28 @@ function animateMove(pointA, pointB, flip = true) {
       if (winner) {
         if (winner.slice(1) == 'draw' && winner[0] == board.turn) {
           declareWinner('Draw');
-          return;
-        }
-        else if (winner == 'w' || winner == 'b') {
-          let colors = {
-            w: 'White',
-            b: 'Black'
+        } else if (winner == 'w' || winner == 'b') {
+          if (againstComp) {
+            if (winner == playerColor) {
+              declareWinner('You win!');
+            } else {
+              declareWinner('Computer wins!');
+            }
+          } else {
+            declareWinner(colors[winner] + ' wins!');
           }
-          declareWinner(colors[winner] + ' wins!');
-          return;
-        } 
+        }
+        matchStarted = false;
+        return;
       }
-      if (flip && !board.pawnPromotion)
+      if (flip && !board.pawnPromotion) {
         board.flipBoard(); 
+      }
+      let otherColor = board.turn == 'w' ? 'b' : 'w';
+      if (board.turn == drawOffer && confirm(colors[otherColor] + ' offers a draw. Accept?')) {
+        declareWinner('Draw');
+      }
+      drawOffer = false;
     }, 300);
   }, 300); 
 }
@@ -185,11 +197,10 @@ function displayEvents(e) {
     
     animateMove(board.selected, move, !againstComp);
     setTimeout(function() {
-      if (againstComp && !board.pawnPromotion) {
+      if (againstComp && !board.pawnPromotion && !board.winner()) {
         computerMove();
       }
     }, 650);
-    
 
   // Visually show all moves and captures
   } else if (board.isPiece(coord) && board[coord][0] == board.turn && coord != board.selected) {
@@ -199,10 +210,8 @@ function displayEvents(e) {
 
     board.selected = coord;
     target.classList.add('selected');
-
     legalMoves = board.legalMoves(coord);
-
-    board.enPassantTarget = null
+    board.enPassantTarget = null;
     
     legalMoves.moves.forEach(function(move) {
       if (move[1] == 'c') {
@@ -228,4 +237,35 @@ function displayEvents(e) {
 function viewBoard() {
   document.querySelector('.game-menu').style.display = 'none';
   document.querySelector('.back').style.display = 'inline';
+}
+
+function resign() {
+  if (!matchStarted) {
+    alert('Start a match first');
+  } else if (confirm('Are you sure you want to resign?')) {
+    if (againstComp) {
+      declareWinner('Computer wins!');
+    } else {
+      let otherColor = board.turn == 'b' ? 'w' : 'b';
+      declareWinner(colors[otherColor] + ' wins!');
+    }
+  }
+}
+
+function draw() {
+  if (!matchStarted) {
+    alert('Start a match first');
+  } else if (confirm('Offer a draw?')) {
+    let otherColor = board.turn == 'b' ? 'w' : 'b';
+    if (againstComp) {
+      if (board.boardScore(otherColor, true) <= 0) {
+        alert('The computer accepts your draw');
+        declareWinner('Draw');
+      } else {
+        alert('The computer declines your draw');
+      }
+    } else {
+      drawOffer = otherColor;
+    }
+  }
 }

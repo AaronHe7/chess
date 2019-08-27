@@ -41,23 +41,31 @@ Chess.prototype.getCopy = function(option = 'shallow') {
   return copy;
 }
 
+Chess.prototype.clearMarkers = function() {
+  let squareDivs = document.querySelectorAll('.board > div > div');
+  for (let i = 0; i < squareDivs.length; i++) {
+    squareDivs[i].innerHTML = '';
+  }
+}
 
 Chess.prototype.addMarkers = function(side) {
+  this.clearMarkers();
+
   let row1 = document.querySelectorAll('.board > div[class="1"] > div');
   let row8 = document.querySelectorAll('.board > div[class="8"] > div');
-  let numberCol = document.querySelectorAll('.board > div > div[class^="a"]');
-
-  let clearRow = side == 'w' ? row8 : row1;
+  let colA = document.querySelectorAll('.board > div > div[class^="a"]');
+  let colH = document.querySelectorAll('.board > div > div[class^="h"]');
+  
+  let numberCol = side == 'w' ? colA : colH;
   let letterRow = side == 'w' ? row1 : row8;
 
   for (let i = 0; i < 8; i++) {
-    clearRow[i].innerHTML = '';
     if (!numberCol[i].innerHTML) {
-      numberCol[i].innerHTML = `<strong class=number-marker>${numberCol[i].classList[0][1]}</strong>`;
+      numberCol[i].innerHTML = `<strong class="number-marker">${numberCol[i].classList[0][1]}</strong>`;
     }
   }
   for (let i = 0; i < 8; i++) {
-    letterRow[i].innerHTML += `<strong class=letter-marker>${String.fromCharCode(97 + i)}</strong>`;
+    letterRow[i].innerHTML += `<strong class="letter-marker">${letterRow[i].classList[0][0]}</strong>`;
   }
 }
 
@@ -96,19 +104,25 @@ Chess.prototype.display = function() {
 }
 
 
-// Puts each row in reverse order
+// Reverses the board vertically and horizontally
 Chess.prototype.flipBoard = function(color = this.turn) {
   const board = document.querySelector('.board');
-  const columns = document.querySelectorAll('.board > div');
+  const rows = document.querySelectorAll('.board > div');
+  
   for (let i = 0; i < 8; i++) {
-    board.appendChild(columns[7 - i]);
+    const row = rows[7 - i];
+    const rowItems = row.children;
+    for (let j = 0; j < 8; j++) {
+      row.appendChild(rowItems[7 - j]);
+    }
+    board.appendChild(row);
   }
   this.addMarkers(color);
 }
 
 
 Chess.prototype.isPiece = function(coord) {
-  return this[coord] && /[a-h][1-8]/.test(coord);
+  return this[coord] && /^[a-h][1-8]$/.test(coord);
 }
 
 
