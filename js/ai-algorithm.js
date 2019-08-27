@@ -1,8 +1,21 @@
+var timeTaken = 0;
+var depth = 3;
 Chess.prototype.getMove = function(color) {
-  return this.minimax(color, 2);
+  var start = new Date().getTime();
+  let move = this.minimax(color, depth);
+  var end = new Date().getTime();
+  timeTaken = end - start;
+  
+  // Adjust layer search based on how much time it took
+  if (timeTaken > 1500) {
+    depth--;
+  } else if (timeTaken < 100) {
+    depth++;
+  }
+  return move;
 }
 
-Chess.prototype.minimax = function(color, depth, maximizingPlayer = true) {
+Chess.prototype.minimax = function(color, depth, alpha = -Infinity, beta = Infinity, maximizingPlayer = true) {
   // If the program runs out of depth, return the current score
   if (depth == 0) {
     return { score: this.boardScore(color, maximizingPlayer) }
@@ -10,8 +23,8 @@ Chess.prototype.minimax = function(color, depth, maximizingPlayer = true) {
 
   var legalMoves = [];
   var otherColor = color == 'b' ? 'w' : 'b';
-  
   maximizingColor = null;
+
   if (maximizingPlayer) {
     maximizingColor = color;
   } else {
@@ -40,43 +53,51 @@ Chess.prototype.minimax = function(color, depth, maximizingPlayer = true) {
 
 
   // Recursively find the score of every legal move
-  var moves = [];
   var board = this;
+  var optimalMoves = null;
 
-  legalMoves.forEach(function(action) {
-    let move = {};
-    move.move = action;
-
+  for (let i = 0; i < legalMoves.length; i++) {
+    let action = legalMoves[i];
     let newBoard = board.getCopy('deep');
     newBoard.movePiece(action[0], action[1]);
 
-    move.score = newBoard.minimax(otherColor, depth - 1, !maximizingPlayer).score;
-    moves.push(move);
-  });
-  
+    let move = {};
+    move.move = action;
+    move.score = newBoard.minimax(otherColor, depth - 1, alpha, beta, !maximizingPlayer).score;
 
-  var optimalMoves = null;
-
-  moves.forEach(function(move) {
-    // If it's the maximizing player, find the highest score
     if (maximizingPlayer) {
-      if (optimalMoves == null || move.score > optimalMoves[0].score) {
+      // Find max move score
+      let bestScore = -Infinity;
+      if (move.score > bestScore) {
         optimalMoves = [move];
-      } else if (move.score == optimalMoves[0].score) {
+      } else if (move.score == bestScore) {
         optimalMoves.push(move);
       }
-    // If it's the minimizing player, find the lowest score
-    } else {
-      if (optimalMoves == null || move.score < optimalMoves[0].score) {
+      bestScore = Math.max(bestScore, move.score);
+      alpha = Math.max(alpha, bestScore);
+      if (alpha >= beta) {
+        break;
+      }
+    // Find min move score
+    } else { 
+      let bestScore = Infinity;
+      
+      if (move.score < bestScore) {
         optimalMoves = [move];
-      } else if (move.score == optimalMoves[0].score) {
+      } else if (move.score == bestScore) {
         optimalMoves.push(move);
+      }
+      bestScore = Math.min(bestScore, move.score);
+      beta = Math.min(bestScore, beta);
+      if (alpha >= beta) {
+        break;
       }
     }
-  });
+  }
 
   // If there is no optimal move, assume terminal state
   if (optimalMoves == null) {
+    console.log('a');
     let winner = this.winner();
     if (winner == 'draw') {
       return { score: 0 }
@@ -88,20 +109,6 @@ Chess.prototype.minimax = function(color, depth, maximizingPlayer = true) {
     }
   }
 
-  // Add entropy to avoid repitition
-  if (depth == 2) {
-    let range = 25;
-    let boardScore = this.boardScore(color, maximizingPlayer);
-    if (boardScore > 1000) {
-      range = boardScore/40;
-    }
-    var bestMoveScore = maximizingPlayer ? Math.max(...moves.map(move => move.score)) :  Math.min(...moves.map(move => move.score));
-    if (maximizingPlayer) {
-      optimalMoves = moves.filter(move => move.score + range >= bestMoveScore);
-    } else {
-      optimalMoves = moves.filter(move => move.score - range <= bestMoveScore);
-    }
-  }
   // Get a random optimal move
   let optimalMove = optimalMoves[Math.floor(Math.random() * optimalMoves.length)]
   return optimalMove;
@@ -151,7 +158,7 @@ Chess.prototype.positionalEvaluation = function(coord) {
   let data = evaluationData;
   
   let evaluationArray = data[piece.type];
-  if (piece.type == 'k' && this.isEndGame()) 
+  if ((piece.type == 'k' || piece.type == 'p') && this.isEndGame(piece.color)) 
     evaluationArray = data['k endgame'];
   
   if (piece.color == 'b')
@@ -167,11 +174,12 @@ Chess.prototype.positionalEvaluation = function(coord) {
 }
 
 // Endgame happens if both sides have no queens or if both sides have zero or one minor pieces
-Chess.prototype.isEndGame = function() {
+Chess.prototype.isEndGame = function(color) {
+  let other = color = 'w' ? 'b' : 'w';
   let count = this.countPieces();
-  if (count['bq'] == 0 && count['wq'] == 0) {
+  if (count[other + 'q'] == 0) {
     return true;
-  } else if (count['wn'] + count['wb'] <= 1 && count['bn'] + count['bb'] <= 1) {
+  } else if (count[other = 'n'] + count[other + 'b'] <= 1) {
     return true;
   }
   return false;

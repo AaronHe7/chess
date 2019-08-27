@@ -8,21 +8,39 @@ var colors = {
 board.display();
 board.addMarkers('w');
 
-function startGame(choice) {
-  matchStarted = true;
-  againstComp = choice == 'computer' ? true : false;
+function clearBoard() {
   document.querySelector('.board').innerHTML = '';
   board = new Chess();
   board.display();
   board.addMarkers('w');
   clearMenu();
   clearTray();
+}
+
+function startGame(choice) {
+  if (choice == 'player') 
+    matchStarted = true;
+  againstComp = choice == 'computer' ? true : false;
+  clearBoard();
+  
   if (againstComp)
     displayMenu('.color-choices');
   document.addEventListener('click', displayEvents);
 }
 
+function compVsComp() {
+  clearMenu();
+  againstComp = true;
+  setInterval(function() {
+    computerMove();
+    if (board.pawnPromotion) {
+      promotePawn('q');
+    }
+  }, 1500);
+}
+
 function playAs(color) {
+  matchStarted = true;
   clearMenu();
   playerColor = color;
   if (color == 'b') {
@@ -50,7 +68,6 @@ function clearMenu() {
     menuDisplays[i].style.display = 'none';
   }
 }
-
 
 function displayMenu(selector) {
   document.querySelector('.game-pause').style.display = 'flex';
@@ -102,15 +119,13 @@ function addCapturedPiece(piece) {
 function animateMove(pointA, pointB, flip = true) {
   if (pointA && pointB) {
     board.cleanUp('target');
-    capturedPiece = null;
+    capturedPiece = board.movePiece(pointA, pointB);
 
     // En passant
     if (board.enPassantTarget) {
       capturedPiece = board[board.enPassantTarget];
       board[board.enPassantTarget] = null;
     }
-
-    capturedPiece = board.movePiece(pointA, pointB);
     
     // Promoting
     if (board.pawnPromotion) {
@@ -258,7 +273,7 @@ function draw() {
   } else if (confirm('Offer a draw?')) {
     let otherColor = board.turn == 'b' ? 'w' : 'b';
     if (againstComp) {
-      if (board.boardScore(otherColor, true) <= 0) {
+      if (board.boardScore(otherColor, true) < 100) {
         alert('The computer accepts your draw');
         declareWinner('Draw');
       } else {

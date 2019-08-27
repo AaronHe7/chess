@@ -278,18 +278,16 @@ Chess.prototype.legalMoves = function(coord, testForCheck = true) {
 
   // Remove any moves that would make the king end up in check
   if (testForCheck) {
-    for (let key in validMoves) {
-      for (let i = 0; i < validMoves[key].length; i++) {
-        let move = validMoves[key][i];
-        let newBoard = this.getCopy();
-        newBoard.movePiece(coord, move, false);
-        let inCheck = newBoard.inCheck(color);
-        if (newBoard.inCheck(color)) {
-          validMoves[key].splice(i, 1);
-          i--;
-        }
-      }
-    }
+    validMoves.moves = validMoves.moves.filter(move => {
+      let newBoard = board.getCopy();
+      newBoard.movePiece(coord, move, false);
+      return !newBoard.inCheck(color);
+    });
+    validMoves.captures = validMoves.captures.filter(capture => {
+      let newBoard = board.getCopy();
+      newBoard.movePiece(coord, capture, false);
+      return !newBoard.inCheck(color);
+    });
   }
   // Add castle moves
   if (type == 'k' && testForCheck) {
@@ -309,7 +307,7 @@ Chess.prototype.legalMoves = function(coord, testForCheck = true) {
 Chess.prototype.findKing = function(color) {
   let kingPos = Object.keys(this).find(key => this[key] == color + 'k');
   if (kingPos)
-    return kingPos
+    return kingPos;
   return false;
 }
 
@@ -349,11 +347,13 @@ Chess.prototype.winner = function() {
 
 // Iterate through each piece and check if it can capture the king
 Chess.prototype.inCheck = function(color) {
+  let kingPos = this.findKing(color);
   for (let coord in this) {
     if (this.isPiece(coord) && this[coord][0] != color) {
       let legalMoves = this.legalMoves(coord, false);
-      let kingPos = this.findKing(color)
-      if (!kingPos || legalMoves.captures.includes(kingPos)) {
+      if (!kingPos)
+      return false;
+      if (legalMoves.captures.includes(kingPos)) {
         return true;
       }
     }
@@ -370,9 +370,9 @@ Array.prototype.toCoordinate = function() {
 // Returns new coordinate based on the given direction
 String.prototype.moveCoord = function(u, r) {
   let letter = String.fromCharCode(this.charCodeAt(0) + r);
-  let number = (parseInt(this[1]) + u).toString();
+  let number = parseInt(this[1]) + u;
 
-  if ('abcdefgh'.includes(letter) && '12345678'.includes(number)) {
+  if (number >= 1 && number <= 8 && 'abcdefgh'.includes(letter)) {
     return letter + number;
   }
   return null;
@@ -395,11 +395,13 @@ Chess.prototype.movePiece = function(pointA, pointB, recordMoves = true) {
     case 'ep':
       let direction = board.turn == 'w' ? 1 : -1;
       
-      let enPassantTarget = pointB.moveCoord(-direction, 0);
+      let enPassantTarget = pointB.slice(2).moveCoord(-direction, 0);
       capturedPiece = board[enPassantTarget];
       board[enPassantTarget] = null;
+      pointB = pointB.slice(2);
       break;
   }
+    
 
   // Record certain moves
   if (recordMoves) {
@@ -451,11 +453,24 @@ Chess.prototype.cleanUp = function(...classes) {
 }
 
 Chess.prototype.countPieces = function() {
-  let result = {}
+  let result = {
+    bp: 0,
+    bn: 0,
+    bb: 0,
+    br: 0,
+    bk: 0,
+    bq: 0,
+    wp: 0,
+    wn: 0,
+    wb: 0,
+    wr: 0,
+    wk: 0,
+    wq: 0
+  }
   for (coord in this) {
     if (this.isPiece(coord)) {
       let piece = this[coord];
-      result[piece] = result[piece] == undefined ? 1 : result[piece] + 1;
+      result[piece] += 1;
     }
   }
   return result;
