@@ -28,6 +28,9 @@
                 <button class="btn" onclick="startGame('player')">Play 1v1</button>
                 <button class="btn" onclick="startGame('computer')">Play Computer</button>
               </div>
+              <div class="center">
+                <button class="btn-small" onclick="compVsComp()">Watch AI vs AI</button>
+              </div>
             </div>
             <div class="color-choices">
               <h1 class="menu-header">Choose a Color</h1>
@@ -38,14 +41,15 @@
             </div>
             <div class="declare-winner">
               <h1 class="menu-header winner-message"></h1>
-              <div class="view-board">
-                <button class="btn-small" onclick="viewBoard()">View Board</button>
-              </div>
               <div class="title">Play Again</div>
               </p>
-              <div class="button-choices center">
+              <div class="center">
                 <button class="btn" onclick="startGame('player')">Play 1v1</button>
                 <button class="btn" onclick="startGame('computer')">Play Computer</button>
+              </div>
+              <div class="center" style="margin-top: 3vh;">
+                <button class="btn-small" onclick="compVsComp()">Watch AI vs AI</button>
+                <button class="btn-small" onclick="viewBoard()">View Board</button>
               </div>
             </div>
             <div class="pawn-promotion">

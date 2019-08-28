@@ -135,9 +135,11 @@ Chess.prototype.isPiece = function(coord) {
 }
 
 Chess.prototype.threeFold = function() {
-  for (state of this.states) {
-    if (state.repititions >= 3) {
-      return true;
+  if (this.recordState) {
+    for (state of this.states) {
+      if (state.repititions >= 3) {
+        return true;
+      }
     }
   }
   return false;

@@ -1,9 +1,9 @@
 var timeTaken = 0;
-var depth = 2;
+var minimaxDepth = 2;
 Chess.prototype.getMove = function(color) {
   var start = new Date().getTime();
-  let move = this.minimax(color, depth);
-  console.log(color + ' moved with score ' + move.score)
+  let move = this.minimax(color, minimaxDepth);
+  console.log(`${color} ${move.move}: score ${move.score}`);
   var end = new Date().getTime();
   timeTaken = end - start;
 
@@ -14,12 +14,25 @@ Chess.prototype.minimax = function(color, depth, maximizingPlayer = true) {
   // If the program runs out of depth, return the current score
   if (depth == 0) {
     return { score: this.getBoardScore(color, maximizingPlayer) }
-  }
+  } 
 
   var legalMoves = [];
   var otherColor = color == 'b' ? 'w' : 'b';
   var maximizingColor = maximizingPlayer ? color : otherColor;
   var board = this;
+
+  if (depth == minimaxDepth - 1) {
+    winner = board.winner();
+    if (winner) {
+      if (winner == maximizingColor) {
+        return { score: 20000 }
+      } else if (winner = 'draw') {
+        return { score: 0 }
+      } else {
+        return { score: -20000 }
+      }
+    }
+  }
 
   for (let coord in this) {
     if (this.isPiece(coord)) {
@@ -29,18 +42,13 @@ Chess.prototype.minimax = function(color, depth, maximizingPlayer = true) {
       }
 
       if (piece.color == color) {
-        let pieceMoves = this.legalMoves(coord, depth == 2);
+        let pieceMoves = this.legalMoves(coord, depth == minimaxDepth);
 
         for (let move of pieceMoves.moves) {
           legalMoves.push([coord, move]);
         }
         for (let capture of pieceMoves.captures) {
           legalMoves.push([coord, capture]);
-		  // Make sure that the king does not move into check
-          if (board[capture] && board[capture][1] == 'k') {
-            //let score = maximizingPlayer ? Infinity : -Infinity;
-            //return { move: [coord, capture], score: score}
-          }
         }
       }
     }
@@ -56,7 +64,7 @@ Chess.prototype.minimax = function(color, depth, maximizingPlayer = true) {
     newBoard.movePiece(action[0], action[1]);
     // Avoid threefold repititions
     if (newBoard.threeFold()) {
-        return { move: action, score: 0 }
+      return { move: action, score: 0 }
     }
     let move = {};
     move.move = action;
@@ -160,11 +168,11 @@ Chess.prototype.positionalEvaluation = function(coord) {
 
 // Endgame happens if both sides have no queens or if both sides have zero or one minor pieces
 Chess.prototype.isEndGame = function(color) {
-  let other = color = 'w' ? 'b' : 'w';
+  let other = color == 'w' ? 'b' : 'w';
   let count = this.countPieces();
   if (count[other + 'q'] == 0) {
     return true;
-  } else if (count[other + 'n'] + count[other + 'b'] <= 1 && count[other + 'r'] <= 1) {
+  } else if (count[other + 'n'] + count[other + 'b'] <= 1 || count[other + 'r'] <= 1) {
     return true;
   }
   return false;

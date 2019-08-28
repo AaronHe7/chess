@@ -47,16 +47,10 @@
 
 .title {
   margin: 0 5vh;
-  margin-top: 6vh;
+  margin-top: 3vh;
   font-size: 5vh;
   font-weight: bold;
   text-align: center;
-}
-
-
-.view-board {
-  display: flex;
-  justify-content: center;
 }
 
 .center {

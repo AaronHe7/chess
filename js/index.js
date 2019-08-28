@@ -38,7 +38,7 @@ function compVsComp() {
     if (board.winner() || board.threeFold()) {
       clearInterval(interval)
     }
-  }, 400);
+  }, 1500);
 }
 
 function playAs(color) {

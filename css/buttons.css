@@ -4,7 +4,7 @@
   border-radius: 1vh;
   font-size: 4vh;
   padding: 2vh;
-  margin: 5vh 3vh;
+  margin: 2vh 3vh;
   cursor: pointer;
   outline: none;
 }
@@ -22,6 +22,7 @@
   padding: 1vh;
   cursor: pointer;
   outline: none;
+  margin: 0 2vh;
 }
 
 .btn-small:hover {
