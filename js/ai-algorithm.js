@@ -1,5 +1,6 @@
 var timeTaken = 0;
 var minimaxDepth = 2;
+
 Chess.prototype.getMove = function(color) {
   var start = new Date().getTime();
   let move = this.minimax(color, minimaxDepth);
@@ -64,7 +65,7 @@ Chess.prototype.minimax = function(color, depth, maximizingPlayer = true) {
     newBoard.movePiece(action[0], action[1]);
     // Avoid threefold repititions
     if (newBoard.threeFold()) {
-      return { move: action, score: 0 }
+      return { move: action, score: maximizingPlayer ? -1000 : 1000 }
     }
     let move = {};
     move.move = action;

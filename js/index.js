@@ -29,7 +29,7 @@ function startGame(choice) {
 }
 
 function compVsComp() {
-  clearMenu();
+  clearBoard();
   let interval = setInterval(function() {
     computerMove();
     if (board.pawnPromotion) {
@@ -38,7 +38,7 @@ function compVsComp() {
     if (board.winner() || board.threeFold()) {
       clearInterval(interval)
     }
-  }, 1500);
+  }, 2500);
 }
 
 function playAs(color) {
@@ -279,7 +279,7 @@ function draw() {
   } else if (confirm('Offer a draw?')) {
     let otherColor = board.turn == 'b' ? 'w' : 'b';
     if (againstComp) {
-      if (board.boardScore(otherColor, true) < 100) {
+      if (board.getBoardScore(otherColor, true) < 100) {
         alert('The computer accepts your draw');
         declareWinner('Draw');
       } else {
