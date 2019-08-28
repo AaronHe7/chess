@@ -335,8 +335,12 @@ Chess.prototype.findKing = function(color) {
 
 
 // If a player is in check and has no possible moves
-Chess.prototype.winner = function() {
-  var colors = ['b', 'w'];
+Chess.prototype.winner = function(checkColor = 'both') {
+  if (checkColor = 'both') {
+    var colors = ['b', 'w'];
+  } else {
+    var colors = [checkColor];
+  }
   for (let i = 0; i < colors.length; i++) {
     let color = colors[i];
     let win = true;
@@ -458,9 +462,9 @@ Chess.prototype.movePiece = function(pointA, pointB, recordMoves = true) {
     this.states = [];
   }
   if (recordMoves && this.recordState) {
-    this.recordBoardState();
     this.pieces[pointB] = this.pieces[pointA];
     this.pieces[pointA] = null;
+    this.recordBoardState();
   }
   return capturedPiece;
 }

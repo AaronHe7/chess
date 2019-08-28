@@ -3,7 +3,7 @@ var minimaxDepth = 2;
 
 Chess.prototype.getMove = function(color) {
   var start = new Date().getTime();
-  let move = this.minimax(color, minimaxDepth);
+  let move = this.minimax(color, minimaxDepth, true);
   console.log(`${color} ${move.move}: score ${move.score}`);
   var end = new Date().getTime();
   timeTaken = end - start;
@@ -23,7 +23,7 @@ Chess.prototype.minimax = function(color, depth, maximizingPlayer = true) {
   var board = this;
 
   if (depth == minimaxDepth - 1) {
-    winner = board.winner();
+    winner = board.winner(color);
     if (winner) {
       if (winner == maximizingColor) {
         return { score: 20000 }
@@ -64,8 +64,9 @@ Chess.prototype.minimax = function(color, depth, maximizingPlayer = true) {
     let newBoard = board.getCopy('deep');
     newBoard.movePiece(action[0], action[1]);
     // Avoid threefold repititions
-    if (newBoard.threeFold()) {
-      return { move: action, score: maximizingPlayer ? -1000 : 1000 }
+    if (depth == minimaxDepth - 1 && newBoard.threeFold()) {
+      console.log('Threefold detected ' + maximizingPlayer);
+      return { move: action, score: -10000 }
     }
     let move = {};
     move.move = action;
@@ -92,7 +93,7 @@ Chess.prototype.minimax = function(color, depth, maximizingPlayer = true) {
   // If there is no optimal move, assume terminal state
   if (optimalMoves.length == 0) {
     console.log('a');
-    let winner = this.winner();
+    let winner = this.winner(color);
     if (winner == 'draw') {
       return { score: 0 }
     }

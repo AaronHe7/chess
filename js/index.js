@@ -1,5 +1,7 @@
 var board = new Chess();
 var capturedPiece, againstComp, playerColor, matchStarted, drawOffer;
+var animationFinished;
+
 var colors = {
   w: 'White',
   b: 'Black'
@@ -30,15 +32,18 @@ function startGame(choice) {
 
 function compVsComp() {
   clearBoard();
+  animationFinished = true;
   let interval = setInterval(function() {
-    computerMove();
-    if (board.pawnPromotion) {
-      promotePawn('q', false);
+    if (animationFinished) {
+      computerMove();
+      if (board.pawnPromotion) {
+        promotePawn('q', false);
+      }
+      if (board.winner() || board.threeFold()) {
+        clearInterval(interval)
+      }
     }
-    if (board.winner() || board.threeFold()) {
-      clearInterval(interval)
-    }
-  }, 2500);
+  }, 50);
 }
 
 function playAs(color) {
@@ -119,6 +124,7 @@ function addCapturedPiece(piece) {
 
 
 function animateMove(pointA, pointB, flip = true) {
+  animationFinished = false;
   if (pointA && pointB) {
     board.cleanUp('target');
     capturedPiece = board.movePiece(pointA, pointB);
@@ -184,6 +190,7 @@ function animateMove(pointA, pointB, flip = true) {
         matchStarted = false;
         return;
       }
+      animationFinished = true;
       if (flip && !board.pawnPromotion) {
         board.flipBoard();
       }
