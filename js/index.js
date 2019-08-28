@@ -96,8 +96,6 @@ function promoteMenu(color) {
 
 function promotePawn(piece, flip) {
   board.changePiece(board.pawnPromotion, piece);
-  if (!againstComp && flip)
-    board.flipBoard();
   clearMenu();
   board.display();
 
@@ -191,9 +189,6 @@ function animateMove(pointA, pointB, flip = true) {
         return;
       }
       animationFinished = true;
-      if (flip && !board.pawnPromotion) {
-        board.flipBoard();
-      }
       let otherColor = board.turn == 'w' ? 'b' : 'w';
       if (board.turn == drawOffer && confirm(colors[otherColor] + ' offers a draw. Accept?')) {
         declareWinner('Draw');
