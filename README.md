@@ -1,8 +1,13 @@
 # Chess with AI
 
+https://aaronhe7.github.io/chess/
+
 In this project, I programmed the entire chess game using HTML, CSS, and JavaScript, including special moves and detecting draws. This game is made using object-oriented programming, where all the rules and logic are implemented using classes and methods. In the game, players can only make legal moves, and whenever a winner or draw is detected, it is automatically announced.   
 
 Additionally, I created an AI that plays logically using a recursive algorithm called minimax. The computer searches the game tree to a depth of 2 and decides what the best move is based on what the board will end up like if it makes that move.
+
+Here is a video of the algorithm playing against itself:  
+https://youtu.be/vxkWigzvVZg
 
 ## Table of Contents
 * [ Special Moves ](#special-moves)
@@ -13,7 +18,6 @@ Additionally, I created an AI that plays logically using a recursive algorithm c
 
 <a name="special-moves"></a>
 ## Special Moves
-***
 Here are some lesser known moves in chess I implemented.  
 
 **Castling**  
