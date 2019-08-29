@@ -68,7 +68,9 @@ Here is a diagram to demonstrate what this algorithm does at depth 2:
 
 <img src="images/readme/minimax.png" alt="Minimax demo" height="200">
 
-At the maximum depth, a score is given to a board in what is called a leaf node. At this stage, all board pieces are given a value. Since the algorithm is playing white, the board state is the value of all white pieces minus the value of all black pieces.
+At the maximum depth, a score is given to a board in what is called a leaf node. At this stage, all board pieces are given a value. Since the algorithm is playing white, the board state is the value of all white pieces minus the value of all black pieces. The algorithm does not calculate every single leaf node before the values are returned to higher levels, but the point is that all values in higher levels are inherited from leaf nodes.
+
+Board states that are terminal, i.e., a win or a draw, are also leaf nodes, even if the depth is higher. It will return an extremely high score if the winner is the computer, zero if there is a draw, and a low score if the winner is the other player. In this case there are none.
 
 How values are given to each piece is subjective, but here are the piece ratings I used for this example:
 
@@ -87,8 +89,9 @@ Here is the final diagram:
 
 <img src="images/readme/minimax-final.png" alt="Minimax demo" height="200">
 
-The final move that was returned happened to be the move I initially assumed was the best.   
-Since my chess algorithm only uses a depth 2 minimax search, the algorithm occasionally does a illogical move. This problem can be solved by increasing the depth, but at the cost of time.
+The final move that was returned happened to be the move I initially assumed was the best. Since my chess algorithm only uses a depth 2 minimax search, the algorithm occasionally does a illogical move. This problem can be solved by increasing the depth, but at the cost of time. If the depth was higher, the levels would alternate taking the maximum value and the minimum value of the board state, depending on which player is moving.
+
+
 
 <a name="what-can-it-do"></a>
 ### What it can do
