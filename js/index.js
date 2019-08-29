@@ -37,7 +37,7 @@ function compVsComp() {
     if (animationFinished) {
       computerMove();
       if (board.pawnPromotion) {
-        promotePawn('q', false);
+        promotePawn('q');
       }
       if (board.winner() || board.threeFold()) {
         clearInterval(interval)
@@ -94,12 +94,12 @@ function promoteMenu(color) {
   };
 }
 
-function promotePawn(piece, flip) {
+function promotePawn(piece) {
   board.changePiece(board.pawnPromotion, piece);
   clearMenu();
-  board.display();
-
   board.turn = board.turn == 'w' ? 'b' : 'w';
+  console.log(board.turn);
+  board.display();
   if (againstComp && playerColor != board.turn)
     computerMove();
 }
@@ -157,10 +157,7 @@ function animateMove(pointA, pointB, flip = true) {
     if (capturedPiece)
       addCapturedPiece(capturedPiece);
     // Make tile red if king is in check
-    if (board.inCheck(board.turn)) {
-      const king = document.querySelector('.' + board.findKing(board.turn));
-      king.classList.add('check');
-    } else {
+    if (!board.inCheck(board.turn)) {
       board.cleanUp('check');
     }
 

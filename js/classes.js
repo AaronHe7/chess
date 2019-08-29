@@ -110,6 +110,10 @@ Chess.prototype.display = function() {
       squareDivs[i].classList.add(`${pieceType}`);
     }
   }
+  if (this.inCheck(this.turn)) {
+    const king = document.querySelector('.' + this.findKing(this.turn));
+    king.classList.add('check');
+  }
 }
 
 
