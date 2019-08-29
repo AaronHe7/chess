@@ -90,7 +90,7 @@ function promoteMenu(color) {
   let imageOrder = ['q', 'r', 'b', 'n'];
   for (let i = 0; i < images.length; i++) {
     // Adjust source images to match the color of the promoting pawn
-    images[i].src = `images/${color}${imageOrder[i]}.png`
+    images[i].src = `images/pieces/${color}${imageOrder[i]}.png`
   };
 }
 
@@ -100,7 +100,7 @@ function promotePawn(piece, flip) {
   board.display();
 
   board.turn = board.turn == 'w' ? 'b' : 'w';
-  if (playerColor != board.turn)
+  if (againstComp && playerColor != board.turn)
     computerMove();
 }
 
@@ -116,7 +116,7 @@ function addCapturedPiece(piece) {
     return;
   let side = piece[0] == 'w' ? 'left' : 'right';
   const captureTray = document.querySelector(`.${side}-sidebar > .tray`);
-  captureTray.innerHTML += `<img src="images/${piece}.png" alt="${piece}">`;
+  captureTray.innerHTML += `<img src="images/pieces/${piece}.png" alt="${piece}">`;
   capturedPiece = null;
 }
 

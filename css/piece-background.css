@@ -1,60 +1,60 @@
 .bp {
-  background-image: url('../images/bp.png');
+  background-image: url('../images/pieces/bp.png');
   background-size: 10vh;
   cursor: pointer;
 }
 .bn {
-  background-image: url('../images/bn.png');
+  background-image: url('../images/pieces/bn.png');
   background-size: 10vh;
   cursor: pointer;
 }
 .bb {
-  background-image: url('../images/bb.png');
+  background-image: url('../images/pieces/bb.png');
   background-size: 10vh;
   cursor: pointer;
 }
 .br {
-  background-image: url('../images/br.png');
+  background-image: url('../images/pieces/br.png');
   background-size: 10vh;
   cursor: pointer;
 }
 .bk {
-  background-image: url('../images/bk.png');
+  background-image: url('../images/pieces/bk.png');
   background-size: 10vh;
   cursor: pointer;
 }
 .bq {
-  background-image: url('../images/bq.png');
+  background-image: url('../images/pieces/bq.png');
   background-size: 10vh;
   cursor: pointer;
 }
 .wp {
-  background-image: url('../images/wp.png');
+  background-image: url('../images/pieces/wp.png');
   background-size: 10vh;
   cursor: pointer;
 }
 .wn {
-  background-image: url('../images/wn.png');
+  background-image: url('../images/pieces/wn.png');
   background-size: 10vh;
   cursor: pointer;
 }
 .wb {
-  background-image: url('../images/wb.png');
+  background-image: url('../images/pieces/wb.png');
   background-size: 10vh;
   cursor: pointer;
 }
 .wr {
-  background-image: url('../images/wr.png');
+  background-image: url('../images/pieces/wr.png');
   background-size: 10vh;
   cursor: pointer;
 }
 .wk {
-  background-image: url('../images/wk.png');
+  background-image: url('../images/pieces/wk.png');
   background-size: 10vh;
   cursor: pointer;
 }
 .wq {
-  background-image: url('../images/wq.png');
+  background-image: url('../images/pieces/wq.png');
   background-size: 10vh;
   cursor: pointer;
 }

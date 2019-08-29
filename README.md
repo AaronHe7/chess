@@ -1,9 +1,17 @@
-# Chess with AI
+# Chess with an AI
+
+In this project, I programmed the entire chess game using HTML, CSS, and JavaScript, including special moves and detecting draws. This game is made using object-oriented programming, where all the rules and logic are implemented using classes and methods. In the game, players can only make legal moves, and whenever a winner (or draw) is found, it is automatically announced.   
+
+Additionally, I created an AI that plays logically using a recursive algorithm called minimax. The computer searches the game tree to a certain depth and decides what the best move is based on what the board will end up like if it makes that move.
+
+## Table of Contents
 ***
-In this project, I programmed the entire chess game using pure HTML, CSS, and JavaScript. This game is made using object-oriented programming, where all the rules and functionality are implemented using classes and methods. These rules include castling, en passant, pawn promotion, and detecting draws. Inside the game, players can only make legal moves, and whenever a winner (or draw) is found, it is automatically declared.   
+* [ Special Moves ](#special-moves)
+* [ Minimax algorithm ](#minimax)
+  * [ How it works ](#minimax-explanation)
 
-Additionally, I created an AI that plays logically using an algorithm called minimax. The computer searches the game tree to a certain depth and decides what the best move is based on the value and worth of each piece in the board.
 
+<a name="special-moves"></a>
 ## Special Moves
 ***
 Here are some lesser known moves in chess I implemented.  
@@ -11,11 +19,72 @@ Here are some lesser known moves in chess I implemented.
 **Castling**  
 Castling occurs when a king moves two spaces to either the left or the right, and the rook crosses over the king. Castling is possible if there are no pieces between the chosen rook and king, and if the king does not move out of, into, or through a check.
 
-**En passant**  
-En passant is a move that a pawn can make when an opposing pawn immidiately makes a double move, ending up adjacent to the current pawn, where the opposing pawn can be captured as if it moved one square forward.
+***
 
+<img src="images/readme/castling.gif" alt="Castling" height="200">
+
+**En passant**  
+En passant is a move that a pawn can make when an opposing pawn makes a double move and ends up adjacent to the current pawn, where the opposing pawn can be captured as if it moved one square forward. The right to en passant is lost after one turn.
+
+<img src="images/readme/en-passant.gif" alt="En passant" height="200">
+
+***
 **Pawn promotion**  
 When a pawn moves to the player's final rank, the pawn can change to either a queen, rook, bishop, or knight.
 
-## Minimax algorithm
+<img src="images/readme/pawn-promotion.gif" alt="En passant" height="200">
 
+***
+
+<a name="minimax"></a>
+## Minimax algorithm  
+***
+The minimax algorithm seeks to find an optimal move, assuming the opponent will also use the minimax algorithm to find a move. The minimax algorithm cannot search the entire game tree, so it is limited to a certain depth. Once the depth reaches its limit, the program evaluates the board state, by assigning a value to each type of piece.
+
+
+<a name="minimax-explanation"></a>
+### How it works
+***
+Consider this 3x3 chess board with white to move. Assume if a pawn moves to the last rank, it will get promoted to a queen.
+
+<img src="images/readme/demo-board.png" alt="3x3 Chess Board" height="200">
+
+In this board state, there are three possible moves for white:
+
+* Move the king up one square
+* Move the pawn up one square
+* Capture the black pawn on the top right
+
+My thought process for this is to think about each move, and what the opponent would do in return.
+
+If I moved the king up, my opponent would capture the white pawn, so I immedietely discard that solution. Taking the pawn on the top right would promote the white pawn into a queen, however my opponent would capture it with his knight on the next turn. 
+
+The final move to consider is to move the pawn up a tile. The pawn would be promoted to a queen, and there would be no possible way for my opponent to capture it. Therefore, I come to the conclusion that moving the pawn up is the best solution.
+
+This is basically what a minimax algorithm does, but it uses numbers to compare moves and choose the best one.
+
+Here is a diagram to demonstrate what this algorithm does at depth 2:
+
+<img src="images/readme/minimax.png" alt="Minimax demo" height="200">
+
+At the maximum depth, a score is given to a board in what is called a leaf node. At this stage, all board pieces are given a value. Since the algorithm is playing white, the board state is the value of all white pieces minus the value of all black pieces.
+
+How values are given to each piece is subjective, but here are the piece ratings I used for this example:
+
+| Pawn | Knight | Bishop | Rook | Queen | King |
+|------|--------|--------|------|-------|------|
+| 1    | 3      | 3      | 5    | 9     | 100  |
+
+The value of the bottom left node is -3 since (100) - (100 + 3) = -3.
+
+***
+After scores are evaluated from the leaf nodes, each score is passed up one level. Since the level above the leaf nodes is black's turn, the algorithm will take the minimum of all the scores passed up. This is because black's optimal move is the move which will harm white the most, and give the lowest score.
+
+Finally, the algorithm passes the nodes to the next top level, and return the node with the best score.
+
+Here is the final diagram:
+
+<img src="images/readme/minimax-final.png" alt="Minimax demo" height="200">
+
+The final move that was returned happened to be the move I initially assumed was the best.   
+Since my chess algorithm only uses a depth 2 minimax search, the algorithm occasionally does a illogical move. This problem can be solved by increasing the depth, but at the cost of time.
