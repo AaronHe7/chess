@@ -2,7 +2,9 @@
 
 https://aaronhe7.github.io/chess/
 
-In this project, I programmed the entire chess game using HTML, CSS, and JavaScript, including special moves and detecting draws. This game is made using object-oriented programming, where all the rules and logic are implemented using classes and methods. In the game, players can only make legal moves, and whenever a winner or draw is detected, it is automatically announced.   
+<img src="images/readme/header.png" alt="header" height="200">
+
+This is the entire game of chess programmed using HTML, CSS, and JavaScript, including special moves and detecting draws. This game is made using object-oriented programming, where all the rules and logic are implemented using classes and methods. In the game, players can only make legal moves, and whenever a winner or draw is detected, it is automatically announced.   
 
 Additionally, I created an AI that plays logically using a recursive algorithm called minimax. The computer searches the game tree to a depth of 2 and decides what the best move is based on what the board will end up like if it makes that move.
 
