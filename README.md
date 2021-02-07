@@ -80,7 +80,7 @@ How values are given to each piece is subjective, but here are the piece ratings
 |------|--------|--------|------|-------|------|
 | 1    | 3      | 3      | 5    | 9     | 100  |
 
-The value of the bottom left node is $-3$ since $(100) - (100 + 3) = -3$.
+The value of the bottom left node is -3 since (100) - (100 + 3) = -3.
 
 ***
 After scores are evaluated from the leaf nodes, each score is passed up one level. Since the level above the leaf nodes is black's turn, the algorithm will take the minimum of all the scores passed up. This is because black's optimal move is the move which will harm white the most, and give the lowest score.
